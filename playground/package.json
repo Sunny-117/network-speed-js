@@ -1,9 +1,7 @@
 {
-  "name": "network-speed-js",
-  "private": false,
-  "description": "A small tool for testing network speed. It also has the ability to test internal and external networks.",
-  "version": "0.0.2",
-  "module": "dist/network-speed-js.js",
+  "name": "playground",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,8 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.6.2",
-    "element-plus": "^2.4.4",
+    "network-speed-js": "^0.0.1",
     "vue": "^3.3.11"
   },
   "devDependencies": {
