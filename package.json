@@ -35,8 +35,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --mode lib",
+    "build:demo": "vite build",
     "preview": "vite preview",
+    "deploy": "sh deploy.sh",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
