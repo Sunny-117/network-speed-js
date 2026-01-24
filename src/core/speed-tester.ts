@@ -19,6 +19,7 @@ export class SpeedTester {
       timeout: options.timeout || 10000,
       autoDetect: options.autoDetect ?? true,
       thresholds: options.thresholds || { fast: 10, medium: 2 },
+      resourceType: options.resourceType || 'image',
     };
   }
 
@@ -99,30 +100,72 @@ export class SpeedTester {
       const timeoutId = setTimeout(() => {
         observer.disconnect();
         reject(new Error(`测速超时: ${url}`));
-      }, this.options.timeout);
+      }, this.options.timeout) as unknown as number;
 
-      // 使用 fetch 请求资源（支持所有类型的资源）
-      fetch(testUrl, {
-        method: 'GET',
-        cache: 'no-store', // 禁用缓存
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          // 读取响应体以确保完整下载
-          return response.blob();
-        })
-        .then(() => {
-          clearTimeout(timeoutId);
-          // Performance Observer 会自动捕获性能数据
-        })
-        .catch((error) => {
-          clearTimeout(timeoutId);
-          observer.disconnect();
-          reject(new Error(`资源加载失败: ${error.message}`));
-        });
+      // 根据资源类型选择加载方式
+      if (this.options.resourceType === 'fetch') {
+        // 使用 fetch 请求资源（需要 CORS 支持）
+        this.loadWithFetch(testUrl, timeoutId, observer, reject);
+      } else {
+        // 使用 Image 对象加载（默认，不受跨域限制）
+        this.loadWithImage(testUrl, timeoutId, observer, reject);
+      }
     });
+  }
+
+  /**
+   * 使用 Image 对象加载资源（默认方式，不受跨域限制）
+   */
+  private loadWithImage(
+    url: string,
+    timeoutId: number,
+    observer: PerformanceObserver,
+    reject: (reason: Error) => void
+  ): void {
+    const img = new Image();
+
+    img.onload = () => {
+      clearTimeout(timeoutId);
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+      reject(new Error(`资源加载失败: ${url}`));
+    };
+
+    img.src = url;
+  }
+
+  /**
+   * 使用 fetch API 加载资源（需要 CORS 支持）
+   */
+  private loadWithFetch(
+    url: string,
+    timeoutId: number,
+    observer: PerformanceObserver,
+    reject: (reason: Error) => void
+  ): void {
+    fetch(url, {
+      method: 'GET',
+      cache: 'no-store', // 禁用缓存
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // 读取响应体以确保完整下载
+        return response.blob();
+      })
+      .then(() => {
+        clearTimeout(timeoutId);
+        // Performance Observer 会自动捕获性能数据
+      })
+      .catch((error) => {
+        clearTimeout(timeoutId);
+        observer.disconnect();
+        reject(new Error(`资源加载失败: ${error.message}`));
+      });
   }
 
   /**

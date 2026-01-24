@@ -172,6 +172,20 @@ new NetworkSpeedSDK(options?: SpeedTestOptions)
 | `autoDetect` | `boolean` | `true` | 是否自动检测内外网 |
 | `timeout` | `number` | `10000` | 超时时间 (ms) |
 | `thresholds` | `object` | `{fast: 10, medium: 2}` | 网速评估阈值 (Mbps) |
+| `resourceType` | `'image' \| 'fetch'` | `'image'` | 资源类型（见下方说明） |
+
+**resourceType 说明：**
+
+- `'image'`（默认）：使用 Image 对象加载
+  - ✅ 不受跨域限制
+  - ✅ 适用于图片资源（.jpg、.png、.webp 等）
+  - ✅ 无需服务器配置 CORS
+  - ⚠️ 仅支持图片格式
+
+- `'fetch'`：使用 fetch API 加载
+  - ✅ 支持任意类型资源（.bin、.json、.txt 等）
+  - ⚠️ 需要服务器配置 CORS
+  - ⚠️ 受跨域限制
 
 #### 方法
 
@@ -265,12 +279,34 @@ interface ResourceSpeedInfo {
 
 ## 💡 使用示例
 
-### 1. 内外网自动检测
+### 1. 使用图片资源测速（默认，推荐）
 
 ```typescript
 const sdk = new NetworkSpeedSDK({
-  intranetUrl: 'https://internal-cdn.company.com/test.bin',
-  internetUrl: 'https://public-cdn.example.com/test.bin',
+  internetUrl: 'https://cdn.example.com/test-image.jpg',
+  // resourceType: 'image', // 默认值，可省略
+});
+
+const result = await sdk.test();
+```
+
+### 2. 使用非图片资源测速（需要 CORS）
+
+```typescript
+const sdk = new NetworkSpeedSDK({
+  internetUrl: 'https://cdn.example.com/test-file.bin',
+  resourceType: 'fetch', // 使用 fetch API
+});
+
+const result = await sdk.test();
+```
+
+### 3. 内外网自动检测
+
+```typescript
+const sdk = new NetworkSpeedSDK({
+  intranetUrl: 'https://internal-cdn.company.com/test.jpg',
+  internetUrl: 'https://public-cdn.example.com/test.jpg',
   autoDetect: true,
 });
 
@@ -278,7 +314,7 @@ const result = await sdk.test();
 console.log(result.isIntranet ? '内网环境' : '外网环境');
 ```
 
-### 2. 首屏加载质量评估
+### 4. 首屏加载质量评估
 
 ```typescript
 const result = await sdk.test();
@@ -489,16 +525,18 @@ dd if=/dev/urandom of=speed-test.bin bs=1024 count=500
 
 **测速文件建议：**
 - 文件大小：200KB ~ 1MB
-- 文件类型：任意（.bin、.jpg、.png、.json、.txt 等）
+- 文件类型：
+  - 图片格式（推荐）：.jpg、.png、.webp（使用默认 `resourceType: 'image'`）
+  - 其他格式：.bin、.json、.txt（需设置 `resourceType: 'fetch'` 并配置 CORS）
 - 禁用缓存
-- 启用 CORS
+- 启用 CORS（仅 fetch 模式需要）
 - 使用 CDN 分发
 
 **支持的资源类型：**
-- ✅ 二进制文件（.bin）
-- ✅ 图片文件（.jpg、.png、.webp）
-- ✅ 文本文件（.txt、.json）
-- ✅ 任何可通过 HTTP 访问的资源
+- ✅ 图片文件（.jpg、.png、.webp）- 默认模式，无需 CORS
+- ✅ 二进制文件（.bin）- 需要 fetch 模式和 CORS
+- ✅ 文本文件（.txt、.json）- 需要 fetch 模式和 CORS
+- ✅ 任何可通过 HTTP 访问的资源 - 需要 fetch 模式和 CORS
 
 ### 配置项详解
 

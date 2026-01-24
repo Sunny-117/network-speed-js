@@ -35,6 +35,11 @@ export interface ResourceSpeedInfo {
 }
 
 /**
+ * 资源类型
+ */
+export type ResourceType = 'image' | 'fetch';
+
+/**
  * SDK配置选项
  */
 export interface SpeedTestOptions {
@@ -51,6 +56,12 @@ export interface SpeedTestOptions {
     fast: number;
     medium: number;
   };
+  /** 
+   * 资源类型
+   * - 'image': 使用 Image 对象加载（默认，不受跨域限制，适用于图片资源）
+   * - 'fetch': 使用 fetch API 加载（需要服务器支持 CORS，适用于任意资源）
+   */
+  resourceType?: ResourceType;
 }
 
 /**

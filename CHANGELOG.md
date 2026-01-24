@@ -12,7 +12,9 @@
   - 使用浏览器原生 `PerformanceResourceTiming` API
   - 准确获取真实网络传输时间和大小
   - 支持实时监听资源加载性能
-  - 使用 `fetch` API 支持任意类型资源测速（不限于图片）
+  - 支持两种资源加载方式：
+    - `image` 模式（默认）：使用 Image 对象，不受跨域限制，适用于图片资源
+    - `fetch` 模式：使用 fetch API，支持任意资源类型，需要 CORS 支持
 
 - **完整的 TypeScript 支持**
   - 提供完整的类型定义
