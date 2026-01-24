@@ -1,6 +1,6 @@
-# Network Speed SDK
-
 <div align="center">
+
+# Network Speed SDK
 
 一个基于 **Performance API** 的现代化网速测试 SDK，支持内外网自动检测、资源监听和完整的 TS 类型支持。
 
@@ -13,7 +13,11 @@
 
 ---
 
+<div align="center">
+
 ## 🎯 核心亮点
+
+</div>
 
 ### 从 Axios 到 Performance API 的技术升级
 
@@ -33,7 +37,11 @@
 
 ---
 
+<div align="center">
+
 ## ✨ 特性
+
+</div>
 
 - 🚀 **基于 Performance API** - 使用浏览器原生 API，准确测量真实下载速度
 - 🔄 **内外网自动检测** - 智能切换内网/外网测速资源
@@ -43,13 +51,21 @@
 - 🌐 **框架无关** - 可用于 Vue、React、Angular 或原生 JavaScript 项目
 - 📦 **轻量级** - 零依赖，体积小巧
 
+<div align="center">
+
 ## 📦 安装
+
+</div>
 
 ```bash
 npm install network-speed-js
 ```
 
+<div align="center">
+
 ## 🚀 快速开始
+
+</div>
 
 ### 原生 JavaScript / TypeScript
 
@@ -173,7 +189,11 @@ export class SpeedTestComponent {
 }
 ```
 
+<div align="center">
+
 ## 📖 API 文档
+
+</div>
 
 ### NetworkSpeedSDK
 
@@ -331,7 +351,11 @@ interface ResourceSpeedInfo {
 }
 ```
 
+<div align="center">
+
 ## 💡 使用示例
+
+</div>
 
 ### 1. 使用图片资源测速（默认，推荐）
 
@@ -479,7 +503,11 @@ const monitor = new NetworkMonitor();
 setInterval(() => monitor.monitor(), 60000); // 每分钟检测
 ```
 
+<div align="center">
+
 ## 🎨 框架集成
+
+</div>
 
 ### Vue 3 自定义 Hook
 
@@ -556,7 +584,11 @@ export function useNetworkSpeed(options = {}) {
 }
 ```
 
+<div align="center">
+
 ## ⚙️ 配置指南
+
+</div>
 
 ### 测速资源准备
 
@@ -641,7 +673,11 @@ dd if=/dev/urandom of=speed-test.bin bs=1024 count=500
 }
 ```
 
+<div align="center">
+
 ## 🔍 核心概念
+
+</div>
 
 ### Performance API 是什么？
 
@@ -664,7 +700,11 @@ Performance API 是浏览器提供的原生性能监控接口，可以精确测�
 2. 如果内网资源超时或失败，自动切换到外网资源
 3. 根据成功的资源判断当前网络环境
 
+<div align="center">
+
 ## 📊 Performance API vs 其他方案
+
+</div>
 
 | 方案 | 准确度 | 可控性 | 复杂度 | 推荐 |
 |------|--------|--------|--------|------|
@@ -704,7 +744,11 @@ const size = entry.transferSize; // 真实传输字节数
 - ✅ 可识别缓存命中
 - ✅ 提供完整的加载时序
 
+<div align="center">
+
 ## ❓ 常见问题
+
+</div>
 
 ### Q1: 测速结果不准确？
 
@@ -780,7 +824,11 @@ if (connection) {
 }
 ```
 
+<div align="center">
+
 ## 🚀 性能优化
+
+</div>
 
 ### 1. 避免频繁测速
 
@@ -845,7 +893,11 @@ async function testSpeed() {
 }
 ```
 
+<div align="center">
+
 ## ⚠️ 注意事项
+
+</div>
 
 ### Performance API 能做什么
 
@@ -861,7 +913,11 @@ async function testSpeed() {
 ❌ 测量 RTT 抖动  
 ❌ 脱离真实请求独立测速  
 
+<div align="center">
+
 ## 🤝 贡献
+
+</div>
 
 欢迎提交 Issue 和 Pull Request！
 
@@ -901,11 +957,19 @@ network-speed-js/
 └── README.md              # 项目文档
 ```
 
+<div align="center">
+
 ## 📄 License
+
+</div>
 
 MIT License
 
+<div align="center">
+
 ## 🔗 相关链接
+
+</div>
 
 - [更新日志 (CHANGELOG)](./CHANGELOG.md)
 - [Performance API 文档](https://developer.mozilla.org/en-US/docs/Web/API/Performance_API)

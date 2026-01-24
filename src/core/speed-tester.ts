@@ -25,9 +25,16 @@ export class SpeedTester {
   private observer: PerformanceObserver | null = null;
 
   constructor(options: SpeedTestOptions) {
-    // 标准化配置
+    // 验证并标准化配置
     if ('useFetch' in options && options.useFetch) {
       // Fetch 模式
+      if (!options.internetUrl) {
+        throw new Error('Fetch模式必须提供 internetUrl 参数');
+      }
+      if (!options.internetUrl.startsWith('http://') && !options.internetUrl.startsWith('https://')) {
+        throw new Error('internetUrl 必须是完整的HTTP/HTTPS URL');
+      }
+      
       this.options = {
         intranetUrl: options.intranetUrl || '',
         internetUrl: options.internetUrl,
@@ -38,14 +45,30 @@ export class SpeedTester {
       };
     } else {
       // Image 模式（默认）
+      const internetImageUrl = 'internetImageUrl' in options ? options.internetImageUrl : '';
+      
+      if (!internetImageUrl) {
+        throw new Error('图片模式必须提供 internetImageUrl 参数');
+      }
+      if (!internetImageUrl.startsWith('http://') && !internetImageUrl.startsWith('https://')) {
+        throw new Error('internetImageUrl 必须是完整的HTTP/HTTPS URL');
+      }
+      
       this.options = {
         intranetUrl: 'intranetImageUrl' in options ? options.intranetImageUrl || '' : '',
-        internetUrl: 'internetImageUrl' in options ? options.internetImageUrl : '',
+        internetUrl: internetImageUrl,
         timeout: options.timeout || 10000,
         autoDetect: options.autoDetect ?? true,
         thresholds: options.thresholds || { fast: 10, medium: 2 },
         useFetch: false,
       };
+    }
+    
+    // 验证内网URL（如果提供）
+    if (this.options.intranetUrl) {
+      if (!this.options.intranetUrl.startsWith('http://') && !this.options.intranetUrl.startsWith('https://')) {
+        throw new Error('intranetUrl/intranetImageUrl 必须是完整的HTTP/HTTPS URL');
+      }
     }
   }
 
