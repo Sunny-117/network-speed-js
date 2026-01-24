@@ -97,7 +97,8 @@ import type { SpeedTestResult, ResourceSpeedInfo } from './index';
 
 // 配置测速URL（可以替换为你自己的资源）
 const intranetImageUrl = 'https://s3-gzpu-inter.didistatic.com/ese-feedback/kefu-workbench/hashiqi.webp';
-const internetImageUrl = 'https://picture.youth.cn/qtdb/202601/W020260124205527678422.jpg';
+const internetImageUrl = 'https://s3-gz01.didistatic.com/ese-feedback/kefu-workbench/hashiqi.webp';
+// const internetImageUrl = 'https://picture.youth.cn/qtdb/202601/W020260124205527678422.jpg';
 
 const apiResult = ref<SpeedTestResult | null>(null);
 const allSpeeds = ref<ResourceSpeedInfo[]>([]);
@@ -114,9 +115,8 @@ const testWithAPI = async () => {
   
   try {
     const sdk = new NetworkSpeedSDK({
-      // intranetImageUrl,
+      intranetImageUrl,
       internetImageUrl,
-      // autoDetect: true,
     });
 
     apiResult.value = await sdk.test();
