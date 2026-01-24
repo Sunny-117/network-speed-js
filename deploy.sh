@@ -15,8 +15,8 @@ cd dist-demo
 
 echo "📦 初始化 Git 仓库..."
 
-# 初始化 git 仓库
-git init
+# 初始化 git 仓库并设置默认分支为 main
+git init -b main
 git add -A
 git commit -m '🚀 Deploy to GitHub Pages'
 
@@ -24,7 +24,7 @@ echo "🌐 部署到 GitHub Pages..."
 
 # 部署到 GitHub Pages
 # 格式: git push -f git@github.com:<USERNAME>/<REPO>.git main:gh-pages
-git push -f git@github.com:Sunny-117/network-speed-js.git main:gh-pages
+git push -f https://github.com/Sunny-117/network-speed-js.git main:gh-pages
 
 echo "✨ 部署成功！"
 echo "🔗 访问地址: https://sunny-117.github.io/network-speed-js/"

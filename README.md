@@ -2,7 +2,7 @@
 
 <div align="center">
 
-一个基于 **Performance API** 的现代化网速测试 SDK，支持内外网自动检测、资源监听和完整的 TypeScript 类型支持。
+一个基于 **Performance API** 的现代化网速测试 SDK，支持内外网自动检测、资源监听和完整的 TS 类型支持。
 
 **框架无关 · 开箱即用 · 准确可靠**
 
