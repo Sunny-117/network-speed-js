@@ -2,7 +2,7 @@
   "name": "network-speed-js",
   "private": false,
   "description": "A framework-agnostic network speed testing SDK based on Performance API with intranet/internet auto-detection support",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Sunny-117",
   "license": "MIT",
   "keywords": [
