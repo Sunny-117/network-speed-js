@@ -1,5 +1,5 @@
 // 核心SDK导出
-export * from './sdk';
+export * from './core/sdk';
 
 // 类型导出
 export type {
@@ -7,7 +7,7 @@ export type {
   SpeedTestOptions,
   ResourceSpeedInfo,
   PerformanceEntryCallback,
-} from './types';
+} from './core/types';
 
 // 工具函数导出
 export {

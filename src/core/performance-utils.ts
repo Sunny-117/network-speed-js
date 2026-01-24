@@ -1,4 +1,4 @@
-import type { ResourceSpeedInfo } from '../types';
+import type { ResourceSpeedInfo } from './types';
 
 /**
  * 计算单个资源的下载速度

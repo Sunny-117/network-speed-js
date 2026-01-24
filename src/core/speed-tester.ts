@@ -2,7 +2,7 @@ import type {
   SpeedTestResult,
   SpeedTestOptions,
   PerformanceEntryCallback,
-} from '../types';
+} from './types';
 import { calcSpeedByResource, evaluateNetworkType, clearPerformanceEntry } from './performance-utils';
 
 /**

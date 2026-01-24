@@ -1,5 +1,5 @@
-import { SpeedTester } from './core/speed-tester';
-import { getAllResourcesSpeeds } from './core/performance-utils';
+import { SpeedTester } from './speed-tester';
+import { getAllResourcesSpeeds } from './performance-utils';
 import type { SpeedTestOptions, SpeedTestResult, ResourceSpeedInfo } from './types';
 
 /**
