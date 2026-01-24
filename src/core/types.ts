@@ -35,18 +35,9 @@ export interface ResourceSpeedInfo {
 }
 
 /**
- * 资源类型
+ * 基础配置选项
  */
-export type ResourceType = 'image' | 'fetch';
-
-/**
- * SDK配置选项
- */
-export interface SpeedTestOptions {
-  /** 内网测速资源URL */
-  intranetUrl?: string;
-  /** 外网测速资源URL */
-  internetUrl?: string;
+interface BaseSpeedTestOptions {
   /** 超时时间 (ms) */
   timeout?: number;
   /** 是否自动检测内外网 */
@@ -56,13 +47,34 @@ export interface SpeedTestOptions {
     fast: number;
     medium: number;
   };
-  /** 
-   * 资源类型
-   * - 'image': 使用 Image 对象加载（默认，不受跨域限制，适用于图片资源）
-   * - 'fetch': 使用 fetch API 加载（需要服务器支持 CORS，适用于任意资源）
-   */
-  resourceType?: ResourceType;
 }
+
+/**
+ * 图片模式配置（默认，不受跨域限制）
+ */
+export interface ImageSpeedTestOptions extends BaseSpeedTestOptions {
+  /** 内网测速图片URL */
+  intranetImageUrl?: string;
+  /** 外网测速图片URL（必填） */
+  internetImageUrl: string;
+}
+
+/**
+ * Fetch模式配置（支持任意资源，需要CORS）
+ */
+export interface FetchSpeedTestOptions extends BaseSpeedTestOptions {
+  /** 内网测速资源URL */
+  intranetUrl?: string;
+  /** 外网测速资源URL（必填） */
+  internetUrl: string;
+  /** 使用fetch模式 */
+  useFetch: true;
+}
+
+/**
+ * SDK配置选项（联合类型）
+ */
+export type SpeedTestOptions = ImageSpeedTestOptions | FetchSpeedTestOptions;
 
 /**
  * Performance Observer 回调参数

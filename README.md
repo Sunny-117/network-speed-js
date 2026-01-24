@@ -53,11 +53,31 @@ npm install network-speed-js
 
 ### 原生 JavaScript / TypeScript
 
+**方式一：使用图片资源测速（推荐，默认模式，无需CORS）**
+
 ```typescript
 import { NetworkSpeedSDK } from 'network-speed-js';
 
 const sdk = new NetworkSpeedSDK({
-  internetUrl: 'https://cdn.example.com/test.bin',
+  internetImageUrl: 'https://cdn.example.com/test-image.jpg',
+  // 可选：内网图片URL
+  intranetImageUrl: 'https://internal-cdn.com/test-image.jpg',
+});
+
+const result = await sdk.test();
+console.log(`网速: ${result.speedMbps} Mbps`);
+```
+
+**方式二：使用任意资源测速（需要CORS支持）**
+
+```typescript
+import { NetworkSpeedSDK } from 'network-speed-js';
+
+const sdk = new NetworkSpeedSDK({
+  internetUrl: 'https://cdn.example.com/test-file.bin',
+  useFetch: true, // 启用fetch模式
+  // 可选：内网资源URL
+  intranetUrl: 'https://internal-cdn.com/test-file.bin',
 });
 
 const result = await sdk.test();
@@ -84,7 +104,7 @@ const result = ref(null);
 const testSpeed = async () => {
   loading.value = true;
   const sdk = new NetworkSpeedSDK({
-    internetUrl: 'https://cdn.example.com/test.bin',
+    internetImageUrl: 'https://cdn.example.com/test-image.jpg',
   });
   result.value = await sdk.test();
   loading.value = false;
@@ -105,7 +125,7 @@ function SpeedTest() {
   const testSpeed = async () => {
     setLoading(true);
     const sdk = new NetworkSpeedSDK({
-      internetUrl: 'https://cdn.example.com/test.bin',
+      internetImageUrl: 'https://cdn.example.com/test-image.jpg',
     });
     const data = await sdk.test();
     setResult(data);
@@ -145,7 +165,7 @@ export class SpeedTestComponent {
   async testSpeed() {
     this.loading = true;
     const sdk = new NetworkSpeedSDK({
-      internetUrl: 'https://cdn.example.com/test.bin',
+      internetImageUrl: 'https://cdn.example.com/test-image.jpg',
     });
     this.result = await sdk.test();
     this.loading = false;
@@ -163,29 +183,63 @@ export class SpeedTestComponent {
 new NetworkSpeedSDK(options?: SpeedTestOptions)
 ```
 
-**配置选项：**
+**参数说明：**
+- `options`（可选）：配置选项
+  - 如果传入配置，可以执行测速
+  - 如果不传配置，只能使用工具函数（`getAllResourcesSpeeds`、`observeResource`）
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `intranetUrl` | `string` | `''` | 内网测速资源URL |
-| `internetUrl` | `string` | `''` | 外网测速资源URL（必填） |
-| `autoDetect` | `boolean` | `true` | 是否自动检测内外网 |
-| `timeout` | `number` | `10000` | 超时时间 (ms) |
-| `thresholds` | `object` | `{fast: 10, medium: 2}` | 网速评估阈值 (Mbps) |
-| `resourceType` | `'image' \| 'fetch'` | `'image'` | 资源类型（见下方说明） |
+**配置选项（两种模式）：**
 
-**resourceType 说明：**
+**模式一：图片模式（默认，推荐）**
 
-- `'image'`（默认）：使用 Image 对象加载
-  - ✅ 不受跨域限制
-  - ✅ 适用于图片资源（.jpg、.png、.webp 等）
-  - ✅ 无需服务器配置 CORS
-  - ⚠️ 仅支持图片格式
+```typescript
+interface ImageSpeedTestOptions {
+  internetImageUrl: string;      // ✅ 必填：外网图片URL
+  intranetImageUrl?: string;     // 可选：内网图片URL
+  timeout?: number;              // 可选：超时时间 (ms)，默认 10000
+  autoDetect?: boolean;          // 可选：是否自动检测内外网，默认 true
+  thresholds?: {                 // 可选：网速评估阈值 (Mbps)
+    fast: number;                // 默认 10
+    medium: number;              // 默认 2
+  };
+}
+```
 
-- `'fetch'`：使用 fetch API 加载
-  - ✅ 支持任意类型资源（.bin、.json、.txt 等）
-  - ⚠️ 需要服务器配置 CORS
-  - ⚠️ 受跨域限制
+**模式二：Fetch模式（支持任意资源，需要CORS）**
+
+```typescript
+interface FetchSpeedTestOptions {
+  internetUrl: string;           // ✅ 必填：外网资源URL
+  useFetch: true;                // ✅ 必填：启用fetch模式
+  intranetUrl?: string;          // 可选：内网资源URL
+  timeout?: number;              // 可选：超时时间 (ms)，默认 10000
+  autoDetect?: boolean;          // 可选：是否自动检测内外网，默认 true
+  thresholds?: {                 // 可选：网速评估阈值 (Mbps)
+    fast: number;                // 默认 10
+    medium: number;              // 默认 2
+  };
+}
+```
+
+**使用示例：**
+
+```typescript
+// ✅ 图片模式（只需要图片URL）
+const sdk1 = new NetworkSpeedSDK({
+  internetImageUrl: 'https://cdn.example.com/test.jpg',
+});
+
+// ✅ Fetch模式（需要URL + useFetch: true）
+const sdk2 = new NetworkSpeedSDK({
+  internetUrl: 'https://cdn.example.com/test.bin',
+  useFetch: true,
+});
+
+// ✅ 无参数实例化（仅用于工具函数）
+const sdk3 = new NetworkSpeedSDK();
+const speeds = sdk3.getAllResourcesSpeeds(); // ✅ 可以使用
+await sdk3.test(); // ❌ 会抛出错误：SDK未配置
+```
 
 #### 方法
 
@@ -283,8 +337,7 @@ interface ResourceSpeedInfo {
 
 ```typescript
 const sdk = new NetworkSpeedSDK({
-  internetUrl: 'https://cdn.example.com/test-image.jpg',
-  // resourceType: 'image', // 默认值，可省略
+  internetImageUrl: 'https://cdn.example.com/test-image.jpg',
 });
 
 const result = await sdk.test();
@@ -295,7 +348,7 @@ const result = await sdk.test();
 ```typescript
 const sdk = new NetworkSpeedSDK({
   internetUrl: 'https://cdn.example.com/test-file.bin',
-  resourceType: 'fetch', // 使用 fetch API
+  useFetch: true, // 必须启用fetch模式
 });
 
 const result = await sdk.test();
@@ -304,9 +357,18 @@ const result = await sdk.test();
 ### 3. 内外网自动检测
 
 ```typescript
+// 图片模式
 const sdk = new NetworkSpeedSDK({
-  intranetUrl: 'https://internal-cdn.company.com/test.jpg',
-  internetUrl: 'https://public-cdn.example.com/test.jpg',
+  intranetImageUrl: 'https://internal-cdn.company.com/test.jpg',
+  internetImageUrl: 'https://public-cdn.example.com/test.jpg',
+  autoDetect: true,
+});
+
+// 或 Fetch模式
+const sdk = new NetworkSpeedSDK({
+  intranetUrl: 'https://internal-cdn.company.com/test.bin',
+  internetUrl: 'https://public-cdn.example.com/test.bin',
+  useFetch: true,
   autoDetect: true,
 });
 

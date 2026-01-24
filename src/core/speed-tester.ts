@@ -6,21 +6,47 @@ import type {
 import { calcSpeedByResource, evaluateNetworkType, clearPerformanceEntry } from './performance-utils';
 
 /**
+ * 内部标准化配置
+ */
+interface NormalizedOptions {
+  intranetUrl: string;
+  internetUrl: string;
+  timeout: number;
+  autoDetect: boolean;
+  thresholds: { fast: number; medium: number };
+  useFetch: boolean;
+}
+
+/**
  * 网速测试核心类
  */
 export class SpeedTester {
-  private options: Required<SpeedTestOptions>;
+  private options: NormalizedOptions;
   private observer: PerformanceObserver | null = null;
 
-  constructor(options: SpeedTestOptions = {}) {
-    this.options = {
-      intranetUrl: options.intranetUrl || '',
-      internetUrl: options.internetUrl || '',
-      timeout: options.timeout || 10000,
-      autoDetect: options.autoDetect ?? true,
-      thresholds: options.thresholds || { fast: 10, medium: 2 },
-      resourceType: options.resourceType || 'image',
-    };
+  constructor(options: SpeedTestOptions) {
+    // 标准化配置
+    if ('useFetch' in options && options.useFetch) {
+      // Fetch 模式
+      this.options = {
+        intranetUrl: options.intranetUrl || '',
+        internetUrl: options.internetUrl,
+        timeout: options.timeout || 10000,
+        autoDetect: options.autoDetect ?? true,
+        thresholds: options.thresholds || { fast: 10, medium: 2 },
+        useFetch: true,
+      };
+    } else {
+      // Image 模式（默认）
+      this.options = {
+        intranetUrl: 'intranetImageUrl' in options ? options.intranetImageUrl || '' : '',
+        internetUrl: 'internetImageUrl' in options ? options.internetImageUrl : '',
+        timeout: options.timeout || 10000,
+        autoDetect: options.autoDetect ?? true,
+        thresholds: options.thresholds || { fast: 10, medium: 2 },
+        useFetch: false,
+      };
+    }
   }
 
   /**
@@ -102,8 +128,8 @@ export class SpeedTester {
         reject(new Error(`测速超时: ${url}`));
       }, this.options.timeout) as unknown as number;
 
-      // 根据资源类型选择加载方式
-      if (this.options.resourceType === 'fetch') {
+      // 根据配置选择加载方式
+      if (this.options.useFetch) {
         // 使用 fetch 请求资源（需要 CORS 支持）
         this.loadWithFetch(testUrl, timeoutId, observer, reject);
       } else {
@@ -131,7 +157,7 @@ export class SpeedTester {
     img.onerror = () => {
       clearTimeout(timeoutId);
       observer.disconnect();
-      reject(new Error(`资源加载失败: ${url}`));
+      reject(new Error(`图片加载失败: ${url}`));
     };
 
     img.src = url;
@@ -192,7 +218,7 @@ export class SpeedTester {
   /**
    * 更新配置
    */
-  updateOptions(options: Partial<SpeedTestOptions>): void {
+  updateOptions(options: Partial<NormalizedOptions>): void {
     this.options = { ...this.options, ...options };
   }
 
