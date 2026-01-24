@@ -1,18 +1,45 @@
 {
   "name": "network-speed-js",
   "private": false,
-  "description": "A small tool for testing network speed. It also has the ability to test internal and external networks.",
-  "version": "0.0.2",
+  "description": "A framework-agnostic network speed testing SDK based on Performance API with intranet/internet auto-detection support",
+  "version": "1.0.0",
+  "author": "Sunny-117",
+  "license": "MIT",
+  "keywords": [
+    "network",
+    "speed",
+    "test",
+    "performance",
+    "bandwidth",
+    "sdk",
+    "typescript",
+    "framework-agnostic",
+    "vue",
+    "react",
+    "angular"
+  ],
+  "main": "dist/network-speed-js.umd.js",
   "module": "dist/network-speed-js.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/network-speed-js.js",
+      "require": "./dist/network-speed-js.umd.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "axios": "^1.6.2",
-    "element-plus": "^2.4.4",
     "vue": "^3.3.11"
   },
   "devDependencies": {
@@ -20,5 +47,13 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vue-tsc": "^1.8.25"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sunny-117/network-speed-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sunny-117/network-speed-js/issues"
+  },
+  "homepage": "https://github.com/Sunny-117/network-speed-js#readme"
 }

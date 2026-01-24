@@ -1,7 +1,0 @@
-lockfileVersion: 5.3
-
-specifiers:
-  network-speed-js: ^0.0.1
-
-dependencies:
-  network-speed-js: link:../../../../../.nvm/versions/node/v16.14.2/pnpm-global/5/node_modules/network-speed-js
