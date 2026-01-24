@@ -471,7 +471,7 @@ location /speed-test.bin {
     add_header Pragma "no-cache";
     add_header Expires "0";
     
-    # 设置内容类型
+    # 设置内容类型（根据实际文件类型调整）
     add_header Content-Type "application/octet-stream";
     
     # 启用 CORS
@@ -489,9 +489,16 @@ dd if=/dev/urandom of=speed-test.bin bs=1024 count=500
 
 **测速文件建议：**
 - 文件大小：200KB ~ 1MB
+- 文件类型：任意（.bin、.jpg、.png、.json、.txt 等）
 - 禁用缓存
 - 启用 CORS
 - 使用 CDN 分发
+
+**支持的资源类型：**
+- ✅ 二进制文件（.bin）
+- ✅ 图片文件（.jpg、.png、.webp）
+- ✅ 文本文件（.txt、.json）
+- ✅ 任何可通过 HTTP 访问的资源
 
 ### 配置项详解
 

@@ -12,6 +12,7 @@
   - 使用浏览器原生 `PerformanceResourceTiming` API
   - 准确获取真实网络传输时间和大小
   - 支持实时监听资源加载性能
+  - 使用 `fetch` API 支持任意类型资源测速（不限于图片）
 
 - **完整的 TypeScript 支持**
   - 提供完整的类型定义

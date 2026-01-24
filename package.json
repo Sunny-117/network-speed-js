@@ -2,7 +2,7 @@
   "name": "network-speed-js",
   "private": false,
   "description": "A framework-agnostic network speed testing SDK based on Performance API with intranet/internet auto-detection support",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Sunny-117",
   "license": "MIT",
   "keywords": [
@@ -35,7 +35,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build --mode lib",
+    "build": "npm run build:lib && npm run build:types",
+    "build:lib": "vite build --mode lib",
+    "build:types": "tsc --project tsconfig.build.json",
     "build:demo": "vite build",
     "preview": "vite preview",
     "deploy": "sh deploy.sh",

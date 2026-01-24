@@ -95,26 +95,33 @@ export class SpeedTester {
 
       observer.observe({ entryTypes: ['resource'] });
 
-      // 创建图片请求
-      const img = new Image();
-      
       // 设置超时
       const timeoutId = setTimeout(() => {
         observer.disconnect();
         reject(new Error(`测速超时: ${url}`));
       }, this.options.timeout);
 
-      img.onload = () => {
-        clearTimeout(timeoutId);
-      };
-
-      img.onerror = () => {
-        clearTimeout(timeoutId);
-        observer.disconnect();
-        reject(new Error(`资源加载失败: ${url}`));
-      };
-
-      img.src = testUrl;
+      // 使用 fetch 请求资源（支持所有类型的资源）
+      fetch(testUrl, {
+        method: 'GET',
+        cache: 'no-store', // 禁用缓存
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          // 读取响应体以确保完整下载
+          return response.blob();
+        })
+        .then(() => {
+          clearTimeout(timeoutId);
+          // Performance Observer 会自动捕获性能数据
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          observer.disconnect();
+          reject(new Error(`资源加载失败: ${error.message}`));
+        });
     });
   }
 

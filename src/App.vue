@@ -6,7 +6,18 @@
     <div class="demo-section">
       <h2>方式一：SDK API 测速</h2>
       <p class="section-desc">使用 SDK 进行网速测试，自动检测内外网环境</p>
-      <button class="api-button" @click="testWithAPI">开始测速</button>
+      <button 
+        class="api-button" 
+        :class="{ loading: isTestingAPI }"
+        @click="testWithAPI"
+        :disabled="isTestingAPI"
+      >
+        <span v-if="!isTestingAPI">开始测速</span>
+        <span v-else class="loading-content">
+          <span class="spinner"></span>
+          测速中...
+        </span>
+      </button>
       <div v-if="apiResult" class="api-result">
         <h3>测速结果：</h3>
         <ul class="result-list">
@@ -41,7 +52,18 @@
     <div class="demo-section">
       <h2>方式三：查看所有资源速度</h2>
       <p class="section-desc">获取页面已加载的所有资源的速度信息</p>
-      <button class="api-button" @click="getAllSpeeds">获取页面所有资源速度</button>
+      <button 
+        class="api-button"
+        :class="{ loading: isGettingSpeeds }"
+        @click="getAllSpeeds"
+        :disabled="isGettingSpeeds"
+      >
+        <span v-if="!isGettingSpeeds">获取页面所有资源速度</span>
+        <span v-else class="loading-content">
+          <span class="spinner"></span>
+          获取中...
+        </span>
+      </button>
       <div v-if="allSpeeds.length > 0" class="speeds-table">
         <table>
           <thead>
@@ -80,9 +102,16 @@ const internetUrl = 'https://s3-gz01.didistatic.com/ese-feedback/kefu-workbench/
 const apiResult = ref<SpeedTestResult | null>(null);
 const allSpeeds = ref<ResourceSpeedInfo[]>([]);
 const observedResources = ref<PerformanceResourceTiming[]>([]);
+const isTestingAPI = ref(false);
+const isGettingSpeeds = ref(false);
 let stopObserver: (() => void) | null = null;
 
 const testWithAPI = async () => {
+  if (isTestingAPI.value) return;
+  
+  isTestingAPI.value = true;
+  apiResult.value = null;
+  
   try {
     const sdk = new NetworkSpeedSDK({
       intranetUrl,
@@ -94,6 +123,8 @@ const testWithAPI = async () => {
   } catch (error) {
     console.error('API测速失败:', error);
     alert(`测速失败: ${error instanceof Error ? error.message : '未知错误'}`);
+  } finally {
+    isTestingAPI.value = false;
   }
 };
 
@@ -117,7 +148,13 @@ const stopObserving = () => {
 };
 
 const getAllSpeeds = () => {
-  allSpeeds.value = getAllResourcesSpeeds();
+  isGettingSpeeds.value = true;
+  
+  // 添加一个小延迟以显示loading效果
+  setTimeout(() => {
+    allSpeeds.value = getAllResourcesSpeeds();
+    isGettingSpeeds.value = false;
+  }, 300);
 };
 
 const getResourceName = (url: string) => {
@@ -197,11 +234,23 @@ h1 {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-right: 10px;
+  position: relative;
+  min-width: 120px;
 }
 
-.api-button:hover {
+.api-button:hover:not(:disabled) {
   background: #5568d3;
   transform: translateY(-1px);
+}
+
+.api-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.api-button.loading {
+  background: #5568d3;
 }
 
 .api-button.secondary {
@@ -210,6 +259,29 @@ h1 {
 
 .api-button.secondary:hover {
   background: #5a6268;
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .api-result {
