@@ -97,7 +97,7 @@ import type { SpeedTestResult, ResourceSpeedInfo } from './index';
 
 // 配置测速URL（可以替换为你自己的资源）
 const intranetImageUrl = 'https://s3-gzpu-inter.didistatic.com/ese-feedback/kefu-workbench/hashiqi.webp';
-const internetImageUrl = 'https://s3-gz01.didistatic.com/ese-feedback/kefu-workbench/hashiqi.webp';
+const internetImageUrl = 'https://picture.youth.cn/qtdb/202601/W020260124205527678422.jpg';
 
 const apiResult = ref<SpeedTestResult | null>(null);
 const allSpeeds = ref<ResourceSpeedInfo[]>([]);
@@ -114,15 +114,31 @@ const testWithAPI = async () => {
   
   try {
     const sdk = new NetworkSpeedSDK({
-      intranetImageUrl,
+      // intranetImageUrl,
       internetImageUrl,
-      autoDetect: true,
+      // autoDetect: true,
     });
 
     apiResult.value = await sdk.test();
   } catch (error) {
     console.error('API测速失败:', error);
-    alert(`测速失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    
+    // 格式化错误信息以便在弹窗中显示
+    const errorMessage = error instanceof Error ? error.message : '未知错误';
+    
+    // 如果是 transferSize=0 的错误，显示更友好的提示
+    if (errorMessage.includes('transferSize')) {
+      alert(
+        '⚠️ 测速失败：无法获取资源大小\n\n' +
+        '这通常是因为跨域资源未设置 Timing-Allow-Origin 响应头。\n\n' +
+        '解决方案：\n' +
+        '1. 在服务端添加响应头：Timing-Allow-Origin: *\n' +
+        '2. 或使用同域资源进行测速\n\n' +
+        '详细信息请查看控制台输出。'
+      );
+    } else {
+      alert(`测速失败: ${errorMessage}`);
+    }
   } finally {
     isTestingAPI.value = false;
   }

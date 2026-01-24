@@ -596,6 +596,9 @@ export function useNetworkSpeed(options = {}) {
 
 ```nginx
 location /speed-test.bin {
+    # ⚠️ 重要：允许跨域访问性能数据（解决 transferSize=0 问题）
+    add_header Timing-Allow-Origin "*";
+    
     # 禁用缓存
     add_header Cache-Control "no-store, no-cache, must-revalidate";
     add_header Pragma "no-cache";
@@ -604,11 +607,17 @@ location /speed-test.bin {
     # 设置内容类型（根据实际文件类型调整）
     add_header Content-Type "application/octet-stream";
     
-    # 启用 CORS
+    # 启用 CORS（仅 fetch 模式需要）
     add_header Access-Control-Allow-Origin "*";
     add_header Access-Control-Allow-Methods "GET, OPTIONS";
 }
 ```
+
+**⚠️ 关键配置说明：**
+
+- `Timing-Allow-Origin: *` - **必须配置**，否则 `transferSize` 会为 0
+- `Cache-Control: no-store` - 禁用缓存，确保每次都是真实下载
+- `Access-Control-Allow-Origin: *` - 仅 fetch 模式需要，图片模式不需要
 
 #### 生成测速文件
 
@@ -822,6 +831,85 @@ if (connection) {
   console.log('网络类型:', connection.effectiveType);
   console.log('下行速度估算:', connection.downlink, 'Mbps');
 }
+```
+
+### Q5: transferSize 为 0 怎么办？⚠️
+
+这是最常见的问题！`entry.transferSize` 为 0 会导致无法计算网速。
+
+**原因分析：**
+
+1. **跨域资源未设置 Timing-Allow-Origin 响应头**（最常见）
+   - 出于安全考虑，浏览器会隐藏跨域资源的详细性能数据
+   - 即使资源很大，`transferSize` 也会显示为 0
+
+2. **资源被浏览器缓存**
+   - 从缓存加载的资源 `transferSize` 可能为 0
+   - SDK 已通过添加时间戳参数避免此问题
+
+3. **资源加载失败**
+   - 网络错误或 404 等情况
+
+**解决方案：**
+
+**方案 1：服务端添加响应头（推荐）**
+
+```nginx
+# Nginx 配置
+location /test-image.jpg {
+    # ✅ 关键：允许跨域访问性能数据
+    add_header Timing-Allow-Origin "*";
+    
+    # 禁用缓存
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+    add_header Pragma "no-cache";
+    add_header Expires "0";
+    
+    # 如果使用 fetch 模式，还需要 CORS
+    add_header Access-Control-Allow-Origin "*";
+}
+```
+
+**方案 2：使用同域资源**
+
+```typescript
+// ✅ 使用同域资源，不受跨域限制
+const sdk = new NetworkSpeedSDK({
+  internetImageUrl: 'https://your-domain.com/test-image.jpg',
+});
+```
+
+**方案 3：使用支持 Timing-Allow-Origin 的公共 CDN**
+
+一些公共 CDN 已经配置了 `Timing-Allow-Origin` 响应头，可以直接使用。
+
+**验证方法：**
+
+在浏览器控制台检查：
+
+```javascript
+// 检查资源的 transferSize
+performance.getEntriesByType('resource').forEach(entry => {
+  if (entry.name.includes('test-image')) {
+    console.log('URL:', entry.name);
+    console.log('transferSize:', entry.transferSize);
+    console.log('encodedBodySize:', entry.encodedBodySize);
+    console.log('decodedBodySize:', entry.decodedBodySize);
+  }
+});
+```
+
+**SDK 错误提示：**
+
+当检测到 `transferSize=0` 时，SDK 会抛出详细错误：
+
+```
+无法获取资源大小（transferSize=0）。
+可能原因：
+1. 跨域资源未设置 Timing-Allow-Origin 响应头
+2. 资源被浏览器缓存
+3. 资源加载失败
+解决方案：在服务端添加响应头 "Timing-Allow-Origin: *"
 ```
 
 <div align="center">

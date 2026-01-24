@@ -120,6 +120,41 @@ export class SpeedTester {
             entry.name.includes(url)
           ) {
             const resourceEntry = entry as PerformanceResourceTiming;
+            
+            // 检查 transferSize 是否为 0（跨域资源未设置 Timing-Allow-Origin）
+            if (resourceEntry.transferSize === 0) {
+              observer.disconnect();
+              
+              // 构建详细的错误信息
+              const errorDetails = [
+                '❌ 无法获取资源大小（transferSize = 0）',
+                '',
+                '📋 可能原因：',
+                '  1. 跨域资源未设置 Timing-Allow-Origin 响应头（最常见）',
+                '  2. 资源被浏览器缓存',
+                '  3. 资源加载失败或网络错误',
+                '',
+                '✅ 解决方案：',
+                '  在服务端添加响应头：',
+                '  Timing-Allow-Origin: *',
+                '',
+                '📖 Nginx 配置示例：',
+                '  location /test-image.jpg {',
+                '    add_header Timing-Allow-Origin "*";',
+                '    add_header Cache-Control "no-store";',
+                '  }',
+                '',
+                `🔗 问题资源: ${url}`,
+                '',
+                '💡 提示：',
+                '  - 使用同域资源可避免此问题',
+                '  - 查看文档了解更多: README.md Q5',
+              ].join('\n');
+              
+              reject(new Error(errorDetails));
+              return;
+            }
+            
             const speedInfo = calcSpeedByResource(resourceEntry);
 
             if (speedInfo) {
