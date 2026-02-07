@@ -117,6 +117,7 @@ const testWithAPI = async () => {
     const sdk = new NetworkSpeedSDK({
       intranetImageUrl,
       internetImageUrl,
+      autoDetect: false,  // 关闭自动检测，直接用外网
     });
 
     apiResult.value = await sdk.test();
